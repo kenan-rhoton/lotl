@@ -7,13 +7,15 @@ readonly FREEMEN=3
 FACTION=0
 
 declare -a FAMILY
-FACTION_OPTIONS="\"Nomads\""
-BASIC_OPTIONS="\"Grow\""
+FACTION_OPTIONS="Nomads"
+BASIC_OPTIONS="Grow"
 GROW_OPTIONS=""
 
 MY_CIV=""
 
 declare -a OPTION_REQS
+
+##NOMAD GROWTH
 OPTION_REQS+=("Hunters Grow none Nomads")
 OPTION_REQS+=("Gatherers Grow none Nomads")
 
@@ -30,6 +32,14 @@ OPTION_REQS+=("Titans Grow none Brutes")
 OPTION_REQS+=("Rangers Grow none Gatherers")
 
 OPTION_REQS+=("Chieftain Grow none Gatherers Hunters")
+
+##NOMAD EXPLORE
+OPTION_REQS+=("Explore Explore lotlExplore Hunters")
+OPTION_REQS+=("Explore Explore lotlExplore Rangers")
+
+##NOMAD ATTACK
+OPTION_REQS+=("Attack Attack lotlAttack Warriors")
+OPTION_REQS+=("Attack Attack lotlAttack Rangers")
 
 
 lotlChoiceAction(){
@@ -83,7 +93,7 @@ lotlFactionSelect(){
 
 lotlStartingFamilies(){
     case "$1" in
-        "\"Nomads\"") _RET="\"Hunters\" \"Gatherers\""
+        "Nomads") _RET="\"Hunters\" \"Gatherers\""
             ;;
         "Settled") _RET="\"Builders\" \"Farmers\" \"Villagers\""
             ;;
@@ -128,10 +138,68 @@ lotlEvaluateGrow(){
     #and if all REQS $4,$5,$6,$7... are in $MY_CIV then add to GROW_OPTIONS
 }
 
+lotlEvaluateExplore(){
+    #if $1 is in $MY_CIV do nothing
+    if ! [[ $MY_CIV =~ "$1" ]]
+    then
+        action=$1
+        shift
+        shift
+        shift
+        put="true"
+        for i in $@
+        do
+            if ! [[ $MY_CIV =~ "$i" ]]
+            then
+                put="false"
+            fi
+        done
+        if [[ $put == "true" ]]
+        then
+            BASIC_OPTIONS+=" $action"
+            MY_CIV+=" $action"
+        fi
+    fi
+    #else if $3 is not none store the action
+    #and if all REQS $4,$5,$6,$7... are in $MY_CIV then add to GROW_OPTIONS
+}
+
+lotlEvaluateAttack(){
+    #if $1 is in $MY_CIV do nothing
+    if ! [[ $MY_CIV =~ "$1" ]]
+    then
+        action=$1
+        shift
+        shift
+        shift
+        put="true"
+        for i in $@
+        do
+            if ! [[ $MY_CIV =~ "$i" ]]
+            then
+                put="false"
+            fi
+        done
+        if [[ $put == "true" ]]
+        then
+            BASIC_OPTIONS+=" $action"
+            MY_CIV+=" $action"
+        fi
+    fi
+    #else if $3 is not none store the action
+    #and if all REQS $4,$5,$6,$7... are in $MY_CIV then add to GROW_OPTIONS
+}
+
+
 lotlEvaluateReq(){
     case "$2" in 
         "Grow") lotlEvaluateGrow $@
             ;;
+        "Explore") lotlEvaluateExplore $@
+            ;;
+        "Attack") lotlEvaluateAttack $@
+            ;;
+        *) lotlEvaluateSpecial $@
     esac
 }
 
@@ -161,8 +229,18 @@ lotlFamilySelect(){
 
 lotlExecuteAction(){
     case "$1" in
-        "\"Grow\"") lotlChoiceAction "Choose how to grow:" $GROW_OPTIONS
+        "Grow") lotlChoiceAction "Choose how to grow:" $GROW_OPTIONS
             lotlGrowAction $_RET
+            ;;
+        "Build") lotlChoiceAction "Choose what to build:" $BUILD_OPTIONS
+            lotlBuildAction
+            ;;
+        "Explore") lotlExploreAction
+            ;;
+        "Claim") lotlClaimAction
+            ;;
+        "Attack") lotlAttackAction
+            ;;
     esac
 }
 
