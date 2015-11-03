@@ -16,7 +16,21 @@ MY_CIV=""
 declare -a OPTION_REQS
 OPTION_REQS+=("Hunters Grow none Nomads")
 OPTION_REQS+=("Gatherers Grow none Nomads")
+
 OPTION_REQS+=("Warriors Grow none Hunters")
+
+OPTION_REQS+=("Barbarians Grow none Warriors")
+OPTION_REQS+=("Brutes Grow none Warriors")
+
+OPTION_REQS+=("Veterans Grow none Barbarians")
+OPTION_REQS+=("Berserkers Grow none Barbarians")
+
+OPTION_REQS+=("Titans Grow none Brutes")
+
+OPTION_REQS+=("Rangers Grow none Gatherers")
+
+OPTION_REQS+=("Chieftain Grow none Gatherers Hunters")
+
 
 lotlChoiceAction(){
     _RET=""
